@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Annotated
-
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -17,6 +15,28 @@ app = typer.Typer(
 )
 
 
+@app.command("help")
+def help_command() -> None:
+    """Show usage information and what hello does."""
+    console = Console()
+    console.print(
+        Panel.fit(
+            "[bold cyan]hello[/bold cyan] converts natural-language requests into safe shell commands.\n\n"
+            "Examples:\n"
+            "  hello list files in this directory\n"
+            "  hello show git status\n"
+            "  hello commit the message 'initial commit'\n\n"
+            "Commands:\n"
+            "  hello auth      Securely configure your LLM API key\n"
+            "  hello history   View recent command history\n"
+            "  hello help      Show this overview\n\n"
+            "Safety:\n"
+            "  Commands are validated before execution and require confirmation.",
+            border_style="cyan",
+        )
+    )
+
+
 @app.command("auth")
 def auth_command() -> None:
     """Set or update the API key used by the LLM agent."""
@@ -30,19 +50,17 @@ def history_command() -> None:
 
 
 @app.callback(invoke_without_command=True)
-def main(
-    ctx: typer.Context,
-    prompt: Annotated[list[str] | None, typer.Argument(help="Natural-language task to convert into a shell command.")] = None,
-) -> None:
+def main(ctx: typer.Context) -> None:
     """Route arbitrary text to the LangGraph agent or show help when no command is provided."""
     if ctx.invoked_subcommand is not None:
         return
 
+    prompt = " ".join(ctx.args).strip()
     if not prompt:
-        typer.echo(ctx.get_help())
+        help_command()
         raise typer.Exit()
 
-    user_prompt = " ".join(prompt)
+    user_prompt = prompt
     console = Console()
 
     try:
