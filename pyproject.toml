@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hello"
+version = "0.1.0"
+description = "AI CLI friend that translates natural language into safe shell commands"
+readme = "readme.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "langchain>=0.3.0",
+    "langgraph>=0.2.0",
+    "langchain-openai>=0.3.0",
+    "keyring>=25.0.0",
+]
+
+[project.scripts]
+hello = "hello_cli.main:app"
+
+[tool.setuptools]
+packages = ["hello_cli"]
