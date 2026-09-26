@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, TypedDict, Literal
+from typing import Literal, TypedDict
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
@@ -8,7 +8,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Confirm
 
-from .auth import get_api_key
+from .auth import get_api_key, get_provider
 
 
 class State(TypedDict):
@@ -35,19 +35,54 @@ DANGEROUS_PATTERNS: tuple[str, ...] = (
 
 
 def _build_model():
-    """Create the configured chat model from the stored API key."""
-    try:
-        from langchain_openai import ChatOpenAI
-    except ImportError as exc:  # pragma: no cover - dependency issue at runtime
-        raise RuntimeError(
-            "langchain-openai is required. Install the project dependencies with pip install -e ."
-        ) from exc
-
-    api_key = get_api_key()
+    """Create the configured chat model from the provider-specific API key."""
+    provider = get_provider()
+    api_key = get_api_key(provider)
     import os
 
-    os.environ["OPENAI_API_KEY"] = api_key
-    return ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    os.environ["HELLO_LLM_PROVIDER"] = provider
+
+    if provider == "openai":
+        try:
+            from langchain_openai import ChatOpenAI
+        except ImportError as exc:  # pragma: no cover - dependency issue at runtime
+            raise RuntimeError(
+                "langchain-openai is required. Install the project dependencies with pip install -e ."
+            ) from exc
+        os.environ["OPENAI_API_KEY"] = api_key
+        return ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+    if provider == "anthropic":
+        try:
+            from langchain_anthropic import ChatAnthropic
+        except ImportError as exc:  # pragma: no cover - dependency issue at runtime
+            raise RuntimeError(
+                "langchain-anthropic is required. Install the project dependencies for Anthropic support."
+            ) from exc
+        os.environ["ANTHROPIC_API_KEY"] = api_key
+        return ChatAnthropic(model="claude-3-5-haiku-latest", temperature=0)
+
+    if provider == "google":
+        try:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+        except ImportError as exc:  # pragma: no cover - dependency issue at runtime
+            raise RuntimeError(
+                "langchain-google-genai is required. Install the project dependencies for Google Gemini support."
+            ) from exc
+        os.environ["GOOGLE_API_KEY"] = api_key
+        return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+
+    if provider == "groq":
+        try:
+            from langchain_groq import ChatGroq
+        except ImportError as exc:  # pragma: no cover - dependency issue at runtime
+            raise RuntimeError(
+                "langchain-groq is required. Install the project dependencies for Groq support."
+            ) from exc
+        os.environ["GROQ_API_KEY"] = api_key
+        return ChatGroq(model="llama-3.1-8b-instant", temperature=0, api_key=api_key)
+
+    raise RuntimeError(f"Unsupported provider selected: {provider}")
 
 
 def _generate_command_node(state: State) -> State:
