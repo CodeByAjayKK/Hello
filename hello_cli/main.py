@@ -14,7 +14,7 @@ from .executor import execute_command
 from .history import log_interaction, show_history
 
 app = typer.Typer(
-    help="hello — your AI CLI friend for safe shell command generation.",
+    help="hiwiz — your AI CLI friend for safe shell command generation.",
     add_completion=False,
 )
 
@@ -46,15 +46,15 @@ def help_command() -> None:
     console = Console()
     console.print(
         Panel.fit(
-            "[bold cyan]hello[/bold cyan] converts natural-language requests into safe shell commands.\n\n"
+            "[bold cyan]hiwiz[/bold cyan] converts natural-language requests into safe shell commands.\n\n"
             "Examples:\n"
-            "  hello list files in this directory\n"
-            "  hello show git status\n"
-            "  hello commit the message 'initial commit'\n\n"
+            "  hiwiz list files in this directory\n"
+            "  hiwiz show git status\n"
+            "  hiwiz commit the message 'initial commit'\n\n"
             "Commands:\n"
-            "  hello auth      Securely configure your LLM API key\n"
-            "  hello history   View recent command history\n"
-            "  hello help      Show this overview\n\n"
+            "  hiwiz auth      Securely configure your LLM API key\n"
+            "  hiwiz history   View recent command history\n"
+            "  hiwiz help      Show this overview\n\n"
             "Safety:\n"
             "  Commands are validated before execution and require confirmation.",
             border_style="cyan",
@@ -89,7 +89,7 @@ def run_prompt(user_prompt: str) -> int:
     except RuntimeError:
         console.print(
             Panel.fit(
-                "[bold red]No API key is configured.[/bold red]\nRun [cyan]hello auth[/cyan] to save your LLM API key securely.",
+                "[bold red]No API key is configured.[/bold red]\nRun [cyan]hiwiz auth[/cyan] to save your LLM API key securely.",
                 border_style="red",
             )
         )
