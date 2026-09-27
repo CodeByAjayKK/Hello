@@ -14,11 +14,12 @@ dependencies = [
     "langchain>=0.3.0",
     "langgraph>=0.2.0",
     "langchain-openai>=0.3.0",
+    "langchain-groq>=0.3.0",
     "keyring>=25.0.0",
 ]
 
 [project.scripts]
-hello = "hello_cli.main:app"
+hello = "hello_cli.main:main"
 
 [tool.setuptools]
 packages = ["hello_cli"]
