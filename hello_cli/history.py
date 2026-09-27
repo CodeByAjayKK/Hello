@@ -1,3 +1,5 @@
+"""SQLite-backed command history for the hello CLI."""
+
 from __future__ import annotations
 
 import sqlite3

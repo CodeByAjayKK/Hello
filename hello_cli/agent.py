@@ -1,5 +1,8 @@
+"""LangGraph workflow for generating and validating shell commands."""
+
 from __future__ import annotations
 
+import os
 from typing import Literal, TypedDict
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -12,6 +15,8 @@ from .auth import get_api_key, get_provider
 
 
 class State(TypedDict):
+    """State carried through the command-generation workflow."""
+
     user_prompt: str
     generated_command: str
     is_safe: bool
@@ -38,7 +43,6 @@ def _build_model():
     """Create the configured chat model from the provider-specific API key."""
     provider = get_provider()
     api_key = get_api_key(provider)
-    import os
 
     os.environ["HELLO_LLM_PROVIDER"] = provider
 
@@ -47,7 +51,8 @@ def _build_model():
             from langchain_openai import ChatOpenAI
         except ImportError as exc:  # pragma: no cover - dependency issue at runtime
             raise RuntimeError(
-                "langchain-openai is required. Install the project dependencies with pip install -e ."
+                "langchain-openai is required. Install the project dependencies "
+                "with pip install -e ."
             ) from exc
         os.environ["OPENAI_API_KEY"] = api_key
         model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
@@ -58,7 +63,8 @@ def _build_model():
             from langchain_anthropic import ChatAnthropic
         except ImportError as exc:  # pragma: no cover - dependency issue at runtime
             raise RuntimeError(
-                "langchain-anthropic is required. Install the project dependencies for Anthropic support."
+                "langchain-anthropic is required. Install the project dependencies "
+                "for Anthropic support."
             ) from exc
         os.environ["ANTHROPIC_API_KEY"] = api_key
         model_name = os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-latest")
@@ -69,7 +75,8 @@ def _build_model():
             from langchain_google_genai import ChatGoogleGenerativeAI
         except ImportError as exc:  # pragma: no cover - dependency issue at runtime
             raise RuntimeError(
-                "langchain-google-genai is required. Install the project dependencies for Google Gemini support."
+                "langchain-google-genai is required. Install the project dependencies "
+                "for Google Gemini support."
             ) from exc
         os.environ["GOOGLE_API_KEY"] = api_key
         model_name = os.getenv("GOOGLE_MODEL", "gemini-1.5-flash")
@@ -80,7 +87,8 @@ def _build_model():
             from langchain_groq import ChatGroq
         except ImportError as exc:  # pragma: no cover - dependency issue at runtime
             raise RuntimeError(
-                "langchain-groq is required. Install the project dependencies for Groq support."
+                "langchain-groq is required. Install the project dependencies "
+                "for Groq support."
             ) from exc
         os.environ["GROQ_API_KEY"] = api_key
         model_name = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
