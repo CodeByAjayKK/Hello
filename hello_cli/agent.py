@@ -50,7 +50,8 @@ def _build_model():
                 "langchain-openai is required. Install the project dependencies with pip install -e ."
             ) from exc
         os.environ["OPENAI_API_KEY"] = api_key
-        return ChatOpenAI(model="gpt-4o-mini", temperature=0)
+        model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        return ChatOpenAI(model=model_name, temperature=0)
 
     if provider == "anthropic":
         try:
@@ -60,7 +61,8 @@ def _build_model():
                 "langchain-anthropic is required. Install the project dependencies for Anthropic support."
             ) from exc
         os.environ["ANTHROPIC_API_KEY"] = api_key
-        return ChatAnthropic(model="claude-3-5-haiku-latest", temperature=0)
+        model_name = os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-latest")
+        return ChatAnthropic(model=model_name, temperature=0)
 
     if provider == "google":
         try:
@@ -70,7 +72,8 @@ def _build_model():
                 "langchain-google-genai is required. Install the project dependencies for Google Gemini support."
             ) from exc
         os.environ["GOOGLE_API_KEY"] = api_key
-        return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
+        model_name = os.getenv("GOOGLE_MODEL", "gemini-1.5-flash")
+        return ChatGoogleGenerativeAI(model=model_name, temperature=0)
 
     if provider == "groq":
         try:
