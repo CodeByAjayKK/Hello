@@ -16,25 +16,21 @@ from .history import log_interaction, show_history
 app = typer.Typer(
     help="hiwiz — your AI CLI friend for safe shell command generation.",
     add_completion=False,
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
 
 
 @app.callback(invoke_without_command=True)
-def callback(
-    ctx: typer.Context,
-    prompt: list[str] = typer.Argument(
-        None,
-        metavar="PROMPT",
-        help="Natural-language prompt to turn into a shell command.",
-        show_default=False,
-    ),
-) -> None:
+def callback(ctx: typer.Context) -> None:
     """Handle either a subcommand or a free-form user prompt."""
     if ctx.invoked_subcommand is not None:
         return
 
-    if prompt:
-        raise typer.Exit(run_prompt(" ".join(prompt)))
+    if ctx.args:
+        joined_prompt = " ".join(ctx.args)
+        if joined_prompt in {"help", "auth", "history"}:
+            return
+        raise typer.Exit(run_prompt(joined_prompt))
 
     help_command()
     raise typer.Exit(0)
