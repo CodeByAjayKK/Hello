@@ -1,15 +1,15 @@
-# hello
+# hiwiz
 
-`hello` is a Python CLI utility that turns natural-language prompts into safe shell commands with a guardrailed LangGraph workflow, secure API key storage, and local execution history.
+`hiwiz` is a Python CLI that turns natural-language requests into safe shell commands using a guardrailed LLM workflow, secure API key storage, and local execution history.
 
 ## Features
 
-- Natural-language to shell command conversion
-- Secure LLM API key storage using the OS credential manager
-- Safety validation against dangerous command patterns
-- Human confirmation before executing a generated command
-- Local SQLite history for recent commands
-- Rich terminal output for commands and history
+- Natural-language shell command generation
+- Secure storage of LLM API keys in the OS keychain
+- Dangerous command blocking before execution
+- Human confirmation for generated commands
+- Local SQLite history of recent interactions
+- Rich terminal output for help, auth, and history
 
 ## Project structure
 
@@ -40,51 +40,78 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-## Configure authentication
+## Authentication
 
 Set your LLM API key securely:
 
 ```bash
-hello auth
+hiwiz auth
+```
+
+You can choose a provider with:
+
+```bash
+hiwiz auth --provider groq
 ```
 
 This prompts for the API key without echoing it to the terminal and stores it in the OS keychain.
 
+You can also configure the provider and API key through environment variables:
+
+```bash
+export HELLO_LLM_PROVIDER=groq
+export GROQ_API_KEY="your-api-key"
+```
+
+You do not need to set these variables if you already configured a provider via `hiwiz auth` or if you want to use the default provider (`openai`).
+
+Model selection is also optional. If you do not set a model variable, hiwiz uses a built-in default for that provider:
+
+```bash
+export OPENAI_MODEL="gpt-4o-mini"
+export ANTHROPIC_MODEL="claude-3-5-haiku-latest"
+export GOOGLE_MODEL="gemini-1.5-flash"
+export GROQ_MODEL="llama-3.3-70b-versatile"
+```
+
+Supported providers are: `openai`, `anthropic`, `google`, and `groq`.
+
 ## Usage
 
-Invoke the CLI with a plain-language request:
+Use built-in commands:
 
 ```bash
-hello list the files in this directory
+hiwiz help
+hiwiz history
 ```
 
-Or with a Git task:
+Send a natural-language request as a prompt:
 
 ```bash
-hello commit the message "initial commit"
+hiwiz "list the files in this directory"
+hiwiz "show git status"
+hiwiz "commit the message 'initial commit'"
 ```
 
-The system will:
+The tool will:
 
-1. Generate a command from your prompt.
-2. Validate it against a blocklist of dangerous commands.
+1. Generate a shell command from the prompt.
+2. Validate it against a blocklist of dangerous patterns.
 3. Show the command for confirmation.
 4. Execute it if approved.
 5. Record the result in local history.
 
 ## History
 
-View recent commands:
+View recent command history:
 
 ```bash
-hello history
+hiwiz history
 ```
-
-This displays the most recent 10 interactions in a Rich table.
 
 ## Security model
 
-The tool intentionally blocks patterns such as:
+The tool intentionally blocks common destructive patterns such as:
 
 - `rm -rf`
 - `mkfs`
@@ -99,5 +126,6 @@ If a generated command matches a blocked pattern, it is refused before execution
 ## Notes
 
 - API keys are stored in the OS credential manager, not in a plaintext file.
-- History is stored at `~/.hello_cli/history.db`.
+- History is stored locally in the app data/history database for the project.
 - A command is only executed after explicit user confirmation.
+- The public usage pattern is: `hiwiz "your prompt"` for normal requests and `hiwiz help` / `hiwiz auth` / `hiwiz history` for built-ins.
