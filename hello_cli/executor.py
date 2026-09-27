@@ -1,3 +1,5 @@
+"""Execution helpers for running validated shell commands safely."""
+
 from __future__ import annotations
 
 import subprocess
@@ -6,6 +8,8 @@ from dataclasses import dataclass
 
 @dataclass
 class CommandExecutionResult:
+    """Structured result for a shell command execution."""
+
     command: str
     returncode: int
     stdout: str

@@ -1,3 +1,5 @@
+"""Authentication helpers for selecting a provider and storing API keys."""
+
 from __future__ import annotations
 
 import getpass
@@ -19,10 +21,14 @@ SUPPORTED_PROVIDERS: Final[tuple[str, ...]] = (
 
 def normalize_provider(provider: str | None) -> str:
     """Normalize and validate the LLM provider name."""
-    normalized = (provider or os.getenv("HELLO_LLM_PROVIDER") or DEFAULT_PROVIDER).lower().strip()
+    normalized = (
+        provider or os.getenv("HELLO_LLM_PROVIDER") or DEFAULT_PROVIDER
+    ).lower().strip()
     if normalized not in SUPPORTED_PROVIDERS:
         supported = ", ".join(SUPPORTED_PROVIDERS)
-        raise ValueError(f"Unsupported provider '{provider}'. Supported providers: {supported}")
+        raise ValueError(
+            f"Unsupported provider '{provider}'. Supported providers: {supported}"
+        )
     return normalized
 
 
@@ -80,7 +86,8 @@ def get_api_key(provider: str | None = None) -> str:
         return api_key
 
     raise RuntimeError(
-        f"No API key is configured for provider '{selected_provider}'. Run 'hello auth --provider {selected_provider}' first."
+        f"No API key is configured for provider '{selected_provider}'. "
+        f"Run 'hello auth --provider {selected_provider}' first."
     )
 
 
@@ -99,4 +106,7 @@ def configure_auth(provider: str | None = None) -> None:
         typer.secho(f"Failed to store the API key securely: {exc}", fg=typer.colors.RED)
         raise typer.Exit(code=1) from exc
 
-    typer.secho(f"API key saved securely for provider '{selected_provider}'.", fg=typer.colors.GREEN)
+    typer.secho(
+        f"API key saved securely for provider '{selected_provider}'.",
+        fg=typer.colors.GREEN,
+    )

@@ -1,3 +1,5 @@
+"""CLI entry point for the hello command."""
+
 from __future__ import annotations
 
 import sys
@@ -95,11 +97,19 @@ def run_prompt(user_prompt: str) -> int:
 
     result = execute_command(generated_command)
     if result.success:
-        console.print(Panel.fit(f"[green]Command succeeded[/green]\n\n[cyan]{generated_command}[/cyan]\n\n{result.stdout or 'No output.'}", border_style="green"))
+        console.print(
+            Panel.fit(
+                f"[green]Command succeeded[/green]\n\n[cyan]{generated_command}[/cyan]\n\n"
+                f"{result.stdout or 'No output.'}",
+                border_style="green",
+            )
+        )
     else:
         console.print(
             Panel.fit(
-                f"[red]Command failed (exit {result.returncode})[/red]\n\n[cyan]{generated_command}[/cyan]\n\n{result.stderr or result.stdout or 'No output.'}",
+                f"[red]Command failed (exit {result.returncode})[/red]\n\n"
+                f"[cyan]{generated_command}[/cyan]\n\n"
+                f"{result.stderr or result.stdout or 'No output.'}",
                 border_style="red",
             )
         )
