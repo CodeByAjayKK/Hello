@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-hello = "hello_cli.main:main"
+hiwiz = "hello_cli.main:main"
 
 [tool.setuptools]
 packages = ["hello_cli"]
