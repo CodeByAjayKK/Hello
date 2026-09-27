@@ -16,7 +16,21 @@ from .history import log_interaction, show_history
 app = typer.Typer(
     help="hello — your AI CLI friend for safe shell command generation.",
     add_completion=False,
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
+
+
+@app.callback(invoke_without_command=True)
+def callback(ctx: typer.Context) -> None:
+    """Handle either a subcommand or a free-form user prompt."""
+    if ctx.invoked_subcommand is not None:
+        return
+
+    if ctx.args:
+        raise typer.Exit(run_prompt(" ".join(ctx.args)))
+
+    help_command()
+    raise typer.Exit(0)
 
 
 @app.command("help")

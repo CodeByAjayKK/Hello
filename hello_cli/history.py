@@ -65,7 +65,7 @@ def fetch_recent_history(limit: int = 10) -> list[dict[str, str | int]]:
                 "success_status": bool(success_status),
             }
         )
-    return list(reversed(records))
+    return records
 
 
 def show_history(limit: int = 10) -> None:
