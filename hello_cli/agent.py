@@ -80,7 +80,8 @@ def _build_model():
                 "langchain-groq is required. Install the project dependencies for Groq support."
             ) from exc
         os.environ["GROQ_API_KEY"] = api_key
-        return ChatGroq(model="llama-3.1-8b-instant", temperature=0, api_key=api_key)
+        model_name = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        return ChatGroq(model=model_name, temperature=0, api_key=api_key)
 
     raise RuntimeError(f"Unsupported provider selected: {provider}")
 

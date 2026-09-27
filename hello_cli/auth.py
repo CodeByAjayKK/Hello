@@ -44,6 +44,13 @@ def get_provider() -> str:
     return normalize_provider(provider)
 
 
+def _selected_provider(provider: str | None = None) -> str:
+    """Resolve the active provider, preferring the explicit argument then stored state."""
+    if provider:
+        return normalize_provider(provider)
+    return get_provider()
+
+
 def set_api_key(api_key: str, provider: str | None = None) -> None:
     """Persist the API key for a provider in the OS keychain."""
     if not api_key or not api_key.strip():
@@ -56,7 +63,7 @@ def set_api_key(api_key: str, provider: str | None = None) -> None:
 
 def get_api_key(provider: str | None = None) -> str:
     """Fetch the stored API key for a provider from the OS keychain."""
-    selected_provider = normalize_provider(provider)
+    selected_provider = _selected_provider(provider)
     api_key = keyring.get_password(SERVICE_NAME, provider_key(selected_provider))
     if api_key:
         return api_key
