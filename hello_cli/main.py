@@ -38,9 +38,15 @@ def help_command() -> None:
 
 
 @app.command("auth")
-def auth_command() -> None:
+def auth_command(
+    provider: str = typer.Option(
+        "openai",
+        "--provider",
+        help="LLM provider to configure. Supported: openai, anthropic, google, groq.",
+    ),
+) -> None:
     """Set or update the API key used by the LLM agent."""
-    configure_auth()
+    configure_auth(provider=provider)
 
 
 @app.command("history")
