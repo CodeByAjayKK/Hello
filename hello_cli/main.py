@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import sys
+
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -55,18 +57,8 @@ def history_command() -> None:
     show_history()
 
 
-@app.callback(invoke_without_command=True)
-def main(ctx: typer.Context) -> None:
-    """Route arbitrary text to the LangGraph agent or show help when no command is provided."""
-    if ctx.invoked_subcommand is not None:
-        return
-
-    prompt = " ".join(ctx.args).strip()
-    if not prompt:
-        help_command()
-        raise typer.Exit()
-
-    user_prompt = prompt
+def run_prompt(user_prompt: str) -> int:
+    """Execute the LangGraph workflow for a free-form user request."""
     console = Console()
 
     try:
@@ -78,28 +70,28 @@ def main(ctx: typer.Context) -> None:
                 border_style="red",
             )
         )
-        raise typer.Exit(code=1) from None
+        return 1
 
     try:
         state = run_agent(user_prompt)
     except Exception as exc:  # pragma: no cover - runtime integration path
         console.print(f"[bold red]Agent execution failed:[/bold red] {exc}")
-        raise typer.Exit(code=1) from exc
+        return 1
 
     generated_command = state.get("generated_command", "").strip()
     if not generated_command:
         console.print("[bold red]The agent did not generate a command.[/bold red]")
-        raise typer.Exit(code=1)
+        return 1
 
     if not state.get("is_safe"):
         console.print("[bold red]Blocked by security policy.[/bold red]")
         log_interaction(user_prompt, generated_command, False)
-        raise typer.Exit(code=1)
+        return 1
 
     if state.get("execution_result") == "Command execution cancelled by user.":
         console.print("[yellow]Execution cancelled by the user.[/yellow]")
         log_interaction(user_prompt, generated_command, False)
-        raise typer.Exit(code=0)
+        return 0
 
     result = execute_command(generated_command)
     if result.success:
@@ -114,10 +106,30 @@ def main(ctx: typer.Context) -> None:
 
     log_interaction(user_prompt, generated_command, result.success)
     if not result.success:
-        raise typer.Exit(code=result.returncode)
+        return result.returncode
 
-    raise typer.Exit(code=0)
+    return 0
+
+
+def main() -> int:
+    """Dispatch either a Typer subcommand or a free-form natural-language prompt."""
+    argv = sys.argv[1:]
+
+    if not argv:
+        help_command()
+        return 0
+
+    if argv[0] in {"help", "auth", "history"} or argv[0] in {"--help", "-h"}:
+        app()
+        return 0
+
+    user_prompt = " ".join(argv).strip()
+    if not user_prompt:
+        help_command()
+        return 0
+
+    return run_prompt(user_prompt)
 
 
 if __name__ == "__main__":
-    app()
+    raise SystemExit(main())
